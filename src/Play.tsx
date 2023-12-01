@@ -30,9 +30,14 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   const isTouching = useRef(false)
 
   const ctxRef = useRef<CanvasRenderingContext2D>()
+  const canvasWidth = useRef(1)
 
   function canvasRefCallback(canvas: HTMLCanvasElement | null) {
     ctxRef.current = canvas?.getContext('2d') ?? undefined
+
+    if (canvas) {
+      canvasWidth.current = canvas.getBoundingClientRect().width
+    }
 
     update()
   }
@@ -87,7 +92,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   }
 
   function onPointerDown(e: PointerEvent<HTMLCanvasElement>) {
-    const p = getPoint(e)
+    const p = getPointScaled(e)
     const q = currentPoint.current
 
     if (distanceWithin(p, q, distanceThreshold)) {
@@ -100,7 +105,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
 
     const line = pictures[currentPictureIndex]!.lines[lineIndex.current]!
 
-    const p = getPoint(e)
+    const p = getPointScaled(e)
 
     let i = pointIndex.current
     const start = i
@@ -186,6 +191,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
           border: '1px solid #aaa',
           display: 'block',
           touchAction: 'none',
+          maxWidth: '100%',
         }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
@@ -206,4 +212,10 @@ function scalePictures(pictures: Picture[], factor: number): Picture[] {
 
 function distanceWithin(a: Point, b: Point, distance: number): boolean {
   return (a.x - b.x) ** 2 + (a.y - b.y) ** 2 < distance ** 2
+}
+
+function getPointScaled(e: PointerEvent<HTMLCanvasElement>): Point {
+  const p = getPoint(e)
+  const factor = e.currentTarget.getBoundingClientRect().width / size
+  return { x: p.x / factor, y: p.y / factor }
 }

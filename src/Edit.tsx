@@ -57,14 +57,14 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
   function onPointerDown(e: PointerEvent<HTMLCanvasElement>) {
     if (drawingLine.current !== undefined) return
 
-    drawingLine.current = [getPointWithFactor(e, size)]
+    drawingLine.current = [getPointWithFactor(e)]
   }
   function onPointerMove(e: PointerEvent<HTMLCanvasElement>) {
     if (drawingLine.current === undefined) return
 
     drawingLine.current = appendPoint(
       drawingLine.current,
-      getPointWithFactor(e, size),
+      getPointWithFactor(e),
     )
 
     update()
@@ -74,7 +74,7 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
 
     lines.current = [
       ...lines.current,
-      appendPoint(drawingLine.current, getPointWithFactor(e, size)),
+      appendPoint(drawingLine.current, getPointWithFactor(e)),
     ]
     drawingLine.current = undefined
 
@@ -148,6 +148,7 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
           border: '1px solid #aaa',
           display: 'block',
           touchAction: 'none',
+          maxWidth: '100%',
         }}
         ref={canvasRefCallback}
         onPointerDown={onPointerDown}
@@ -166,10 +167,8 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
   )
 }
 
-function getPointWithFactor(
-  e: PointerEvent<HTMLCanvasElement>,
-  factor = 1,
-): Point {
+function getPointWithFactor(e: PointerEvent<HTMLCanvasElement>): Point {
+  const factor = e.currentTarget.offsetWidth
   const p = getPoint(e)
   return { x: p.x / factor, y: p.y / factor }
 }
