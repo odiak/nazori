@@ -17,6 +17,8 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
     [rawPictures],
   )
 
+  const [count, setCount] = useState(0)
+
   const [currentPictureIndex, setCurrentPictureIndex] = useState(() =>
     Math.floor(Math.random() * pictures.length),
   )
@@ -152,6 +154,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
       lineIndex.current += 1
 
       if (lineIndex.current === lines.length) {
+        setCount((count) => count + 1)
         lineIndex.current = 0
         if (pictures.length >= 2) {
           while (true) {
@@ -177,6 +180,23 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
     update()
   }
 
+  function skip() {
+    lineIndex.current = 0
+    if (pictures.length >= 2) {
+      while (true) {
+        const newIndex = Math.floor(Math.random() * pictures.length)
+        if (newIndex !== currentPictureIndex) {
+          setCurrentPictureIndex(newIndex)
+          currentPoint.current = pictures[newIndex]!.lines[0]![0]!
+          break
+        }
+      }
+    } else {
+      currentPoint.current = pictures[currentPictureIndex]!.lines[0]![0]!
+    }
+    update()
+  }
+
   if (pictures.length === 0) {
     return <div>データがありません</div>
   }
@@ -198,6 +218,8 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
       />
+      <button onClick={skip}>とばす</button>
+      {count > 0 && <p>{count}回クリアしたよ</p>}
     </>
   )
 }
