@@ -4,8 +4,15 @@ import { Picture } from './types'
 import { Play } from './Play'
 
 export const App: FC = () => {
-  const [pictures, setPictures] = useState<Picture[]>([])
+  const [pictures, setPictures] = useState<Picture[]>(
+    () => restorePictures() ?? [],
+  )
   const [isEditing, setIsEditing] = useState(false)
+
+  function onChangePictures(pictures: Picture[]) {
+    setPictures(pictures)
+    savePictures(pictures)
+  }
 
   return (
     <>
@@ -15,11 +22,26 @@ export const App: FC = () => {
       </button>
       {isEditing ? (
         <div>
-          <Edit pictures={pictures} onChange={setPictures} />
+          <Edit pictures={pictures} onChange={onChangePictures} />
         </div>
       ) : (
         <Play pictures={pictures} />
       )}
     </>
   )
+}
+
+function restorePictures(): Picture[] | undefined {
+  const picturesStr = localStorage.getItem('nazori-pictures')
+  if (!picturesStr) return
+  try {
+    return JSON.parse(picturesStr)
+  } catch (e) {
+    console.error(e)
+    return
+  }
+}
+
+function savePictures(pictures: Picture[]) {
+  localStorage.setItem('nazori-pictures', JSON.stringify(pictures))
 }
