@@ -9,7 +9,7 @@ type Props = {
 }
 
 const size = 500
-const distanceThreshold = 30
+const distanceThreshold = 40
 
 export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   const pictures = useMemo(
