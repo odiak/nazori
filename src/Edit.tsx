@@ -144,7 +144,11 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
       <canvas
         width={size}
         height={size}
-        style={{ border: '1px solid #aaa', display: 'block' }}
+        style={{
+          border: '1px solid #aaa',
+          display: 'block',
+          touchAction: 'none',
+        }}
         ref={canvasRefCallback}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}

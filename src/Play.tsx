@@ -211,7 +211,11 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
         width={size}
         height={size}
         ref={canvasRefCallback}
-        style={{ border: '1px solid #aaa', display: 'block' }}
+        style={{
+          border: '1px solid #aaa',
+          display: 'block',
+          touchAction: 'none',
+        }}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
