@@ -2,7 +2,7 @@ import React, { FC, PointerEvent, useMemo, useRef, useState } from 'react'
 import { Picture, Point } from './types'
 import { drawLine, getPoint } from './utils/canvas'
 import { vAdd, vDot, vScale, vSub } from './utils/vector'
-import { appendPoint } from './utils/point'
+import { appendPoint, distanceToSegment } from './utils/point'
 
 type Props = {
   pictures: Picture[]
@@ -98,59 +98,34 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   function onPointerMove(e: PointerEvent<HTMLCanvasElement>) {
     if (!isTouching.current) return
 
-    const lines = pictures[currentPictureIndex]!.lines[lineIndex.current]!
+    const line = pictures[currentPictureIndex]!.lines[lineIndex.current]!
 
     const p = getPoint(e)
 
     let i = pointIndex.current
-    const a = lines[i]!
-    const b = lines[i + 1]!
-    const ab = vSub(b, a)
-    const t = vDot(vSub(p, a), ab) / vDot(ab, ab)
+    const start = i
+    const end = Math.min(line.length - 2, i + 6)
+    let distance = Number.POSITIVE_INFINITY
+    let nearest: Point | undefined
 
-    let q: Point | undefined
-
-    if (t < 0) {
-      q = a
-    } else if (t > 1) {
-      if (i === lines.length - 2) {
-        q = b
-      } else {
-        for (i += 1; i < lines.length - 1; i++) {
-          const a = lines[i]!
-          const b = lines[i + 1]!
-          const ab = vSub(b, a)
-          const t = vDot(vSub(p, a), ab) / vDot(ab, ab)
-
-          if (t < 0) {
-            q = a
-            break
-          } else if (t > 1) {
-            if (i === lines.length - 2) {
-              q = b
-              break
-            } else {
-              continue
-            }
-          } else {
-            q = vAdd(a, vScale(ab, t))
-            break
-          }
-        }
+    for (let j = start; j <= end; j++) {
+      const [d, q] = distanceToSegment(p, line[j]!, line[j + 1]!)
+      if (d < distance) {
+        distance = d
+        nearest = q
+        i = j
       }
-    } else {
-      q = vAdd(a, vScale(ab, t))
     }
 
-    if (q === undefined || !distanceWithin(p, q, distanceThreshold)) {
+    if (nearest === undefined || distance >= distanceThreshold) {
       isTouching.current = false
-      currentPoint.current = lines[0]!
+      currentPoint.current = line[0]!
       pointIndex.current = 0
       update()
       return
     }
 
-    currentPoint.current = q
+    currentPoint.current = nearest
     pointIndex.current = i
     update()
   }
