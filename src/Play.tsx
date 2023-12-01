@@ -198,7 +198,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   }
 
   if (pictures.length === 0) {
-    return <div>no pictures</div>
+    return <div>データがありません</div>
   }
 
   return (

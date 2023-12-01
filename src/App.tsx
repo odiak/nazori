@@ -9,8 +9,9 @@ export const App: FC = () => {
 
   return (
     <>
+      <p>なぞり書きの練習</p>
       <button onClick={() => setIsEditing(!isEditing)}>
-        {isEditing ? 'Finish editing' : 'Edit'}
+        {isEditing ? '編集をおわる' : '編集する'}
       </button>
       {isEditing ? (
         <div>

@@ -155,12 +155,12 @@ export const Edit: FC<Props> = ({ pictures: initialPictures, onChange }) => {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
       />
-      <button onClick={undo}>undo</button>
+      <button onClick={undo}>1つ消す</button>
       <button onClick={clear} style={{ marginLeft: 8 }}>
-        clear
+        全部消す
       </button>
       <button onClick={onDone} style={{ marginLeft: 40 }}>
-        done
+        保存する
       </button>
     </>
   )
