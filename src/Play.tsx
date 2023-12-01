@@ -108,9 +108,6 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
     const ab = vSub(b, a)
     const t = vDot(vSub(p, a), ab) / vDot(ab, ab)
 
-    console.log('---')
-    console.log(i, t)
-
     let q: Point | undefined
 
     if (t < 0) {
@@ -124,7 +121,6 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
           const b = lines[i + 1]!
           const ab = vSub(b, a)
           const t = vDot(vSub(p, a), ab) / vDot(ab, ab)
-          console.log(i, t)
 
           if (t < 0) {
             q = a
