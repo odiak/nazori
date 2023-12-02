@@ -9,7 +9,7 @@ type Props = {
 }
 
 const size = 500
-const distanceThreshold = 40
+const distanceThreshold = 60
 
 export const Play: FC<Props> = ({ pictures: rawPictures }) => {
   const pictures = useMemo(
@@ -30,6 +30,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
     ] ?? { x: 0, y: 0 },
   )
   const isTouching = useRef(false)
+  const reachedToEnd = useRef(false)
 
   const ctxRef = useRef<CanvasRenderingContext2D>()
   const canvasWidth = useRef(1)
@@ -109,7 +110,13 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
 
     const p = getPointScaled(e)
 
+    if (distanceWithin(p, line[line.length - 1]!, distanceThreshold * 0.5)) {
+      reachedToEnd.current = true
+    }
+
     let i = pointIndex.current
+    if (i === line.length - 2) return
+
     const start = i
     const end = Math.min(line.length - 2, i + 6)
     let distance = Number.POSITIVE_INFINITY
@@ -144,12 +151,14 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
 
     if (
       pointIndex.current === currentLine.length - 2 ||
+      reachedToEnd.current ||
       distanceWithin(
         currentPoint.current,
         currentLine[currentLine.length - 1]!,
-        distanceThreshold,
+        distanceThreshold * 0.25,
       )
     ) {
+      reachedToEnd.current = false
       pointIndex.current = 0
       lineIndex.current += 1
 
@@ -176,8 +185,10 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
     update()
   }
   function onPointerCancel(e: PointerEvent<HTMLCanvasElement>) {
-    isTouching.current = false
-    update()
+    onPointerUp(e)
+  }
+  function onPointerOut(e: PointerEvent<HTMLCanvasElement>) {
+    onPointerUp(e)
   }
 
   function skip() {
@@ -217,6 +228,7 @@ export const Play: FC<Props> = ({ pictures: rawPictures }) => {
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
+        onPointerOut={onPointerOut}
       />
       <button onClick={skip}>とばす</button>
       {count > 0 && <p>{count}回クリアしたよ</p>}
